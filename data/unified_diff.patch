@@ -1,0 +1,110 @@
+diff -Naur lipstick-jolla-home-qt5/layers/EdgeLayer.qml /usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
+--- a/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml	2015-09-04 21:33:22.000000000 +0200
++++ b/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml	2015-09-07 17:40:18.002909420 +0200
+@@ -30,6 +30,9 @@
+     property bool _smoothClip
+     property bool _effectiveActive
+ 
++    property real intermediateStepThreshold: 0
++    property bool intermediateStepReached: false
++
+     onActiveChanged: {
+         _smoothClip = clip
+         _effectiveActive = active
+@@ -73,6 +76,7 @@
+             var dx = active ? x : x - _rightEdge
+             var dy = active ? y : y - _bottomEdge
+             if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
++                intermediateStepReached = true
+                 peekFilter.gestureTriggered()
+             } else {
+                 peekFilter.gestureCanceled()
+@@ -250,6 +254,18 @@
+         bottomEnabled: (edgeLayer.edge == PeekFilter.Bottom && !edgeLayer.active)
+                     || (edgeLayer.edge == PeekFilter.Top && edgeLayer.active)
+ 
++        onGestureStarted: intermediateStepReached = false
++
++        onAbsoluteProgressChanged: {
++           if (absoluteProgress == 0) {
++              return
++           } else if (absoluteProgress > intermediateStepThreshold && !intermediateStepReached) {
++              intermediateStepReached = true
++           } else if (absoluteProgress < intermediateStepThreshold && intermediateStepReached) {
++              intermediateStepReached = false
++           }
++        }
++
+         states: [
+             State {
+                 name: "bottom"
+diff -Naur lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml /usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
+--- a/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml	2015-09-04 21:33:22.000000000 +0200
++++ b/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml	2015-09-07 17:45:30.503157330 +0200
+@@ -11,6 +11,12 @@
+ 
+     edge: PeekFilter.Top
+ 
++    /*
++     * FIXME: having the threshold hardcoded here is super ugly.
++     * I should dig more on lipstick and fix this.
++    */
++    intermediateStepThreshold: 600
++
+     function show() {
+         if (!active) {
+             toggleActive()
+diff -Naur lipstick-jolla-home-qt5/powerkey/PowerButton.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
+--- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml	2015-09-04 21:33:22.000000000 +0200
++++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml	2015-09-07 16:24:04.039003517 +0200
+@@ -6,7 +6,8 @@
+ 
+     property url iconSource
+     property alias icon: icon
+-    readonly property bool down: pressed || pressTimer.running
++    property bool assumeDown: false
++    readonly property bool down: pressed || pressTimer.running || assumeDown
+ 
+     property alias offset: content.y
+ 
+diff -Naur lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
+--- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml	2015-09-04 21:33:22.000000000 +0200
++++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml	2015-09-07 17:38:53.530299611 +0200
+@@ -26,6 +26,8 @@
+     readonly property real stackedItemHeight: Theme.paddingSmall
+     readonly property real bottomStackHeight: Math.max(0, stackedItemHeight*Math.min((powerMenu.count-itemCount+1), stackCount))
+ 
++    readonly property bool lockIndication: !Lipstick.compositor.powerKeyLayer.intermediateStepReached
++
+     property real contextMenuProgress
+ 
+     implicitWidth: 4 * Theme.itemSizeExtraLarge
+@@ -43,6 +45,19 @@
+         }
+     }
+ 
++    /*
++     * FIXME: I'm a bit of a noob with QML, is this the right way
++     * to connect to a foreign signal?
++    */
++    Component.onCompleted: Lipstick.compositor.powerKeyLayer.edgeFilter.gestureTriggered.connect(powerMenu.lockScreen)
++
++    function lockScreen() {
++        if (lockIndication) {
++            Lipstick.compositor.powerKeyLayer.hide()
++            Lipstick.compositor.setDisplayOff()
++        }
++    }
++
+     model: AmbienceInstallModel {
+         id: installModel
+ 
+@@ -146,6 +161,8 @@
+             clip: powerTransition.running
+             visible: !shutdownButton.visible || powerTransition.running
+ 
++            assumeDown: lockIndication
++
+             onClicked: Lipstick.compositor.setDisplayOff()
+ 
+             iconSource: "image://theme/graphic-display-blank"

@@ -1,0 +1,8 @@
+{
+	"name": "Restore swipe to lock",
+	"description": "This patch restores the swipe to lock feature.",
+	"category": "homescreen",
+	"infos": {
+		"maintainer": "Eugenio Paolantonio"
+	}
+}
