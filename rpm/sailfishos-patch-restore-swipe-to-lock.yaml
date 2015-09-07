@@ -31,6 +31,7 @@ Builder: qtc5
 Requires:
   - patchmanager
   - jolla-settings-system >= 0.3.41.4-10.60.1.jolla
+  - lipstick-jolla-home-qt5 >= 0.28.7.34-10.101.3.jolla
   - sailfish-version >= 1.1.9-10.33.28.jolla
 
 # All installed files
