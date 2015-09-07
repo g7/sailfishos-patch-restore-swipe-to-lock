@@ -14,7 +14,7 @@ Name:       sailfishos-patch-restore-swipe-to-lock
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Restore swipe to lock
 Version:    1.1.9.28
-Release:    1
+Release:    2
 Group:      Applications/Productivity
 License:    GPLv2+
 BuildArch:  noarch
@@ -22,6 +22,8 @@ URL:        http://me.medesimo.eu
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  sailfishos-patch-restore-swipe-to-lock.yaml
 Requires:   patchmanager
+Requires:   jolla-settings-system >= 0.3.41.4-10.60.1.jolla
+Requires:   lipstick-jolla-home-qt5 >= 0.28.7.34-10.101.3.jolla
 Requires:   sailfish-version >= 1.1.9-10.33.28.jolla
 
 %description

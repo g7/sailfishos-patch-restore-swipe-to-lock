@@ -8,5 +8,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue Sep 08 2015 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-2
+- [patch] Make Swipe to lock action (including the threshold) configurable
+- [packaging] Depend on jolla-settings-system.
+- [packaging] Depend on lipstick-jolla-home-qt5.
+
 * Mon Sep 07 2015 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-1
 - Initial release
