@@ -22,8 +22,8 @@ INSTALLS += \
 
 
 OTHER_FILES += \
-    rpm/sailfishos-patch-restore-swipe-to-lock.changes.in \
     rpm/sailfishos-patch-restore-swipe-to-lock.spec \
     rpm/sailfishos-patch-restore-swipe-to-lock.yaml \
     data/unified_diff.patch \
-    data/patch.json
+    data/patch.json \
+    rpm/sailfishos-patch-restore-swipe-to-lock.changes
