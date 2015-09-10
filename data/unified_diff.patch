@@ -1,7 +1,6 @@
-diff -Naur lipstick-jolla-home-qt5/layers/EdgeLayer.qml /usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
---- a/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml	2015-09-04 21:33:22.000000000 +0200
-+++ b/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml	2015-09-07 17:40:18.002909420 +0200
-@@ -30,6 +30,9 @@
+--- a/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
++++ b/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
+@@ -30,6 +30,9 @@ Layer {
      property bool _smoothClip
      property bool _effectiveActive
  
@@ -11,7 +10,7 @@ diff -Naur lipstick-jolla-home-qt5/layers/EdgeLayer.qml /usr/share/lipstick-joll
      onActiveChanged: {
          _smoothClip = clip
          _effectiveActive = active
-@@ -73,6 +76,7 @@
+@@ -73,6 +76,7 @@ Layer {
              var dx = active ? x : x - _rightEdge
              var dy = active ? y : y - _bottomEdge
              if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
@@ -19,7 +18,7 @@ diff -Naur lipstick-jolla-home-qt5/layers/EdgeLayer.qml /usr/share/lipstick-joll
                  peekFilter.gestureTriggered()
              } else {
                  peekFilter.gestureCanceled()
-@@ -250,6 +254,18 @@
+@@ -250,6 +254,18 @@ Layer {
          bottomEnabled: (edgeLayer.edge == PeekFilter.Bottom && !edgeLayer.active)
                      || (edgeLayer.edge == PeekFilter.Top && edgeLayer.active)
  
@@ -28,7 +27,7 @@ diff -Naur lipstick-jolla-home-qt5/layers/EdgeLayer.qml /usr/share/lipstick-joll
 +        onAbsoluteProgressChanged: {
 +           if (absoluteProgress == 0) {
 +              return
-+           } else if (absoluteProgress > intermediateStepThreshold && !intermediateStepReached) {
++           } else if (edgeLayer._hideActive || (absoluteProgress > intermediateStepThreshold && !intermediateStepReached)) {
 +              intermediateStepReached = true
 +           } else if (absoluteProgress < intermediateStepThreshold && intermediateStepReached) {
 +              intermediateStepReached = false
@@ -38,21 +37,20 @@ diff -Naur lipstick-jolla-home-qt5/layers/EdgeLayer.qml /usr/share/lipstick-joll
          states: [
              State {
                  name: "bottom"
-diff -Naur lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml /usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
---- a/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml	2015-09-04 21:33:22.000000000 +0200
-+++ b/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml	2015-09-07 23:54:43.608035410 +0200
+--- a/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
++++ b/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
 @@ -1,6 +1,7 @@
  import QtQuick 2.0
  import Sailfish.Silica 1.0
  import Sailfish.Lipstick 1.0
 +import org.nemomobile.configuration 1.0
-
+ 
  EdgeLayer {
      id: powerKeyLayer
-@@ -11,6 +12,17 @@
-
+@@ -11,6 +12,17 @@ EdgeLayer {
+ 
      edge: PeekFilter.Top
-
+ 
 +    ConfigurationGroup {
 +        id: swipeToLockSettings
 +
@@ -67,11 +65,9 @@ diff -Naur lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml /usr/share/lipstick-
      function show() {
          if (!active) {
              toggleActive()
-
-diff -Naur lipstick-jolla-home-qt5/powerkey/PowerButton.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
---- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml	2015-09-04 21:33:22.000000000 +0200
-+++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml	2015-09-07 16:24:04.039003517 +0200
-@@ -6,7 +6,8 @@
+--- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
++++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
+@@ -6,7 +6,8 @@ MouseArea {
  
      property url iconSource
      property alias icon: icon
@@ -81,10 +77,9 @@ diff -Naur lipstick-jolla-home-qt5/powerkey/PowerButton.qml /usr/share/lipstick-
  
      property alias offset: content.y
  
-diff -Naur lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml /usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
---- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml	2015-09-04 21:33:22.000000000 +0200
-+++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml	2015-09-07 17:38:53.530299611 +0200
-@@ -26,6 +26,8 @@
+--- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
++++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
+@@ -26,6 +26,8 @@ SilicaListView {
      readonly property real stackedItemHeight: Theme.paddingSmall
      readonly property real bottomStackHeight: Math.max(0, stackedItemHeight*Math.min((powerMenu.count-itemCount+1), stackCount))
  
@@ -93,7 +88,7 @@ diff -Naur lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml /usr/share/lipstick
      property real contextMenuProgress
  
      implicitWidth: 4 * Theme.itemSizeExtraLarge
-@@ -43,6 +45,19 @@
+@@ -43,6 +45,19 @@ SilicaListView {
          }
      }
  
@@ -113,7 +108,7 @@ diff -Naur lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml /usr/share/lipstick
      model: AmbienceInstallModel {
          id: installModel
  
-@@ -146,6 +161,8 @@
+@@ -146,6 +161,8 @@ SilicaListView {
              clip: powerTransition.running
              visible: !shutdownButton.visible || powerTransition.running
  
@@ -122,11 +117,10 @@ diff -Naur lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml /usr/share/lipstick
              onClicked: Lipstick.compositor.setDisplayOff()
  
              iconSource: "image://theme/graphic-display-blank"
-diff -Naur jolla-settings/pages/gestures/gestures.qml /usr/share/jolla-settings/pages/gestures/gestures.qml
---- a/usr/share/jolla-settings/pages/gestures/gestures.qml	2000-01-01 01:00:00.000000000 +0100
-+++ b/usr/share/jolla-settings/pages/gestures/gestures.qml	2015-09-07 23:59:40.531571795 +0200
-@@ -42,6 +42,30 @@
-
+--- a/usr/share/jolla-settings/pages/gestures/gestures.qml
++++ b/usr/share/jolla-settings/pages/gestures/gestures.qml
+@@ -42,6 +42,30 @@ Page {
+ 
              IconTextSwitch {
                  automaticCheck: false
 +                checked: swipeToLockSettings.enabled
@@ -156,7 +150,7 @@ diff -Naur jolla-settings/pages/gestures/gestures.qml /usr/share/jolla-settings/
                  checked: desktopSettings.left_peek_to_events
                  //% "Quick Events access"
                  text: qsTrId("settings_display-la-left_peek_at_events")
-@@ -59,4 +83,12 @@
+@@ -59,4 +83,12 @@ Page {
          property bool close_from_top: false
          property bool left_peek_to_events: false
      }
