@@ -14,7 +14,7 @@ Name:       sailfishos-patch-restore-swipe-to-lock
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Restore swipe to lock
 Version:    1.1.9.28
-Release:    2
+Release:    3
 Group:      Applications/Productivity
 License:    GPLv2+
 BuildArch:  noarch

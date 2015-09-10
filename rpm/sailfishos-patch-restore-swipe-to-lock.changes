@@ -8,6 +8,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Sep 10 2015 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-3
+- [patch] Assume intermediateStepReached = true when hiding from the opposite edge
+- [packaging] Ship the changelog
+
 * Tue Sep 08 2015 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-2
 - [patch] Make Swipe to lock action (including the threshold) configurable
 - [packaging] Depend on jolla-settings-system.
