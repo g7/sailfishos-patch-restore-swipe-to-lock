@@ -39,18 +39,23 @@
                  name: "bottom"
 --- a/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
 +++ b/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,9 @@
++
  import QtQuick 2.0
  import Sailfish.Silica 1.0
  import Sailfish.Lipstick 1.0
 +import org.nemomobile.configuration 1.0
++import org.nemomobile.lipstick 0.1
  
  EdgeLayer {
      id: powerKeyLayer
-@@ -11,6 +12,17 @@ EdgeLayer {
+@@ -11,6 +14,30 @@ EdgeLayer {
  
      edge: PeekFilter.Top
  
++    property bool verticalOrientation: Lipstick.compositor.topmostWindowOrientation === Qt.PortraitOrientation
++                                       || Lipstick.compositor.topmostWindowOrientation === Qt.InvertedPortraitOrientation
++
 +    ConfigurationGroup {
 +        id: swipeToLockSettings
 +
@@ -60,7 +65,17 @@
 +        property int threshold: 50
 +    }
 +
-+    intermediateStepThreshold: swipeToLockSettings.enabled ? Math.round((Screen.height * swipeToLockSettings.threshold) / 100) : 0
++    intermediateStepThreshold: swipeToLockSettings.enabled ? 
++                                   Math.round(
++                                       (
++                                           (verticalOrientation ?
++                                              Screen.height :
++                                              Screen.width
++                                           ) * swipeToLockSettings.threshold
++                                       ) / 100
++                                   ) :
++                                   0
++
 +
      function show() {
          if (!active) {
