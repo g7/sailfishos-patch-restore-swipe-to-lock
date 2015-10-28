@@ -8,6 +8,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Wed Oct 28 2015 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-5
+- [patch] Move assumeDown declaration and test at the bottom of PowerButton.qml to avoid conflicts with other patches
+
 * Fri Sep 18 2015 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-4
 - [patch] Calculate threshold using the screen width when on landscape.
 
