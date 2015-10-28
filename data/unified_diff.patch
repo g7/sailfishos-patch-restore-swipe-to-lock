@@ -65,7 +65,7 @@
 +        property int threshold: 50
 +    }
 +
-+    intermediateStepThreshold: swipeToLockSettings.enabled ? 
++    intermediateStepThreshold: swipeToLockSettings.enabled ?
 +                                   Math.round(
 +                                       (
 +                                           (verticalOrientation ?
@@ -82,16 +82,23 @@
              toggleActive()
 --- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
 +++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
-@@ -6,7 +6,8 @@ MouseArea {
+@@ -30,7 +30,7 @@ MouseArea {
  
-     property url iconSource
-     property alias icon: icon
--    readonly property bool down: pressed || pressTimer.running
+             anchors.centerIn: parent
+ 
+-            source: button.down
++            source: (button.down || assumeDown)
+                     ? button.iconSource + "?" + Theme.highlightColor
+                     : button.iconSource
+ 
+@@ -38,4 +38,7 @@ MouseArea {
+             height: Theme.iconSizeLauncher
+         }
+     }
++
++    /* This is at the bottom to avoid conflicts with other patches */
 +    property bool assumeDown: false
-+    readonly property bool down: pressed || pressTimer.running || assumeDown
- 
-     property alias offset: content.y
- 
+ }
 --- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
 +++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
 @@ -26,6 +26,8 @@ SilicaListView {
