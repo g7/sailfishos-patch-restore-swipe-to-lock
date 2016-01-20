@@ -101,15 +101,15 @@
  }
 --- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
 +++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
-@@ -26,6 +26,8 @@ SilicaListView {
-     readonly property real stackedItemHeight: Theme.paddingSmall
-     readonly property real bottomStackHeight: Math.max(0, stackedItemHeight*Math.min((powerMenu.count-itemCount+1), stackCount))
+@@ -19,6 +19,8 @@ SilicaListView {
+     property int itemCount: 5
+     property int stackCount: 4
  
 +    readonly property bool lockIndication: !Lipstick.compositor.powerKeyLayer.intermediateStepReached
 +
-     property real contextMenuProgress
- 
-     implicitWidth: 4 * Theme.itemSizeExtraLarge
+     readonly property bool largeScreen: Screen.sizeCategory >= Screen.Large
+     readonly property real exposure: currentItem
+             ? Lipstick.compositor.powerKeyLayer.absoluteExposure + currentItem.height - itemHeight
 @@ -43,6 +45,19 @@ SilicaListView {
          }
      }
