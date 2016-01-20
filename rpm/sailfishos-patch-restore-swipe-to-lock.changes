@@ -8,6 +8,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Wed Jan 20 2016 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-6
+- [patch] Move the lockIndication declaration further up to avoid context conflict with another patch
+
 * Wed Oct 28 2015 Eugenio "g7" Paolantonio <me@medesimo.eu> 1.1.9.28-5
 - [patch] Move assumeDown declaration and test at the bottom of PowerButton.qml to avoid conflicts with other patches
 

@@ -1,7 +1,7 @@
 Name: sailfishos-patch-restore-swipe-to-lock
 Summary: Restore swipe to lock
 Version: 1.1.9.28
-Release: 5
+Release: 6
 BuildArch: noarch
 # The contents of the Group field should be one of the groups listed here:
 # http://gitorious.org/meego-developer-tools/spectacle/blobs/master/data/GROUPS
