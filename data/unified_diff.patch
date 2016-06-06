@@ -82,7 +82,7 @@
              toggleActive()
 --- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
 +++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
-@@ -30,7 +30,7 @@ MouseArea {
+@@ -32,7 +32,7 @@ MouseArea {
  
              anchors.centerIn: parent
  
@@ -91,7 +91,7 @@
                      ? button.iconSource + "?" + Theme.highlightColor
                      : button.iconSource
  
-@@ -38,4 +38,7 @@ MouseArea {
+@@ -40,4 +40,7 @@ MouseArea {
              height: Theme.iconSizeLauncher
          }
      }
@@ -110,7 +110,7 @@
      readonly property bool largeScreen: Screen.sizeCategory >= Screen.Large
      readonly property real exposure: currentItem
              ? Lipstick.compositor.powerKeyLayer.absoluteExposure + currentItem.height - itemHeight
-@@ -43,6 +45,19 @@ SilicaListView {
+@@ -46,6 +48,19 @@ SilicaListView {
          }
      }
  
@@ -130,7 +130,7 @@
      model: AmbienceInstallModel {
          id: installModel
  
-@@ -146,6 +161,8 @@ SilicaListView {
+@@ -178,6 +193,8 @@ SilicaListView {
              clip: powerTransition.running
              visible: !shutdownButton.visible || powerTransition.running
  
@@ -172,11 +172,10 @@
                  checked: desktopSettings.left_peek_to_events
                  //% "Quick Events access"
                  text: qsTrId("settings_display-la-left_peek_at_events")
-@@ -59,4 +83,12 @@ Page {
-         property bool close_from_top: false
+@@ -76,5 +100,13 @@ Page {
          property bool left_peek_to_events: false
      }
-+
+ 
 +    ConfigurationGroup {
 +        id: swipeToLockSettings
 +        path: "/desktop/lipstick-jolla-home/swipeToLock"
@@ -184,4 +183,6 @@
 +        property bool enabled: true
 +        property int threshold: 50
 +    }
++
+     DisplaySettings { id: displaySettings }
  }
