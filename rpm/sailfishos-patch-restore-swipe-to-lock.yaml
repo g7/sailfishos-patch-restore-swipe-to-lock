@@ -1,6 +1,6 @@
 Name: sailfishos-patch-restore-swipe-to-lock
 Summary: Restore swipe to lock
-Version: 2.0.2.43
+Version: 3.0.0.5
 Release: 1
 BuildArch: noarch
 # The contents of the Group field should be one of the groups listed here:
@@ -30,9 +30,9 @@ Builder: qtc5
 # Runtime dependencies which are not automatically detected
 Requires:
   - patchmanager
-  - jolla-settings-system >= 0.6.8.1-10.78.1.jolla
-  - lipstick-jolla-home-qt5 >= 0.33.36.1-10.112.7.jolla
-  - sailfish-version >= 2.0.2-10.35.43.jolla
+  - jolla-settings-system >= 0.39.7-1.20.2.jolla
+  - lipstick-jolla-home-qt5 >= 1.0.31-1.18.2.jolla
+  - sailfish-version >= 3.0.0-1.8.5.jolla
 
 # All installed files
 Files:

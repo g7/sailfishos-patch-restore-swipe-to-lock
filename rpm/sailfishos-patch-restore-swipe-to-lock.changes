@@ -8,6 +8,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Fri Nov 02 2018 Eugenio "g7" Paolantonio <me@medesimo.eu> 3.0.0.5-1
+- [data] patch: Updated patch to match Sailfish OS 3.0.0.5 Lemmenjoki
+
 * Fri Jul 29 2016 Eugenio "g7" Paolantonio <me@medesimo.eu> 2.0.2.43-1
 - [data] patch: updated to match SailfishOS 2.0.2.43 'Aurajoki'
 
