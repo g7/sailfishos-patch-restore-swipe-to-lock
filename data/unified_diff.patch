@@ -1,5 +1,7 @@
---- a/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
-+++ b/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
+Index: /usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
+===================================================================
+--- .orig/usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
++++ /usr/share/lipstick-jolla-home-qt5/layers/EdgeLayer.qml
 @@ -30,6 +30,9 @@ Layer {
      property bool _smoothClip
      property bool _effectiveActive
@@ -37,113 +39,13 @@
          states: [
              State {
                  name: "bottom"
---- a/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
-+++ b/usr/share/lipstick-jolla-home-qt5/layers/PowerKeyLayer.qml
-@@ -1,6 +1,9 @@
-+
- import QtQuick 2.0
- import Sailfish.Silica 1.0
- import Sailfish.Lipstick 1.0
-+import org.nemomobile.configuration 1.0
-+import org.nemomobile.lipstick 0.1
+Index: /usr/share/jolla-settings/pages/gestures/gestures.qml
+===================================================================
+--- .orig/usr/share/jolla-settings/pages/gestures/gestures.qml
++++ /usr/share/jolla-settings/pages/gestures/gestures.qml
+@@ -32,6 +32,30 @@ Page {
  
- EdgeLayer {
-     id: powerKeyLayer
-@@ -11,6 +14,30 @@ EdgeLayer {
- 
-     edge: PeekFilter.Top
- 
-+    property bool verticalOrientation: Lipstick.compositor.topmostWindowOrientation === Qt.PortraitOrientation
-+                                       || Lipstick.compositor.topmostWindowOrientation === Qt.InvertedPortraitOrientation
-+
-+    ConfigurationGroup {
-+        id: swipeToLockSettings
-+
-+        path: "/desktop/lipstick-jolla-home/swipeToLock"
-+
-+        property bool enabled: true
-+        property int threshold: 50
-+    }
-+
-+    intermediateStepThreshold: swipeToLockSettings.enabled ?
-+                                   Math.round(
-+                                       (
-+                                           (verticalOrientation ?
-+                                              Screen.height :
-+                                              Screen.width
-+                                           ) * swipeToLockSettings.threshold
-+                                       ) / 100
-+                                   ) :
-+                                   0
-+
-+
-     function show() {
-         if (!active) {
-             toggleActive()
---- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
-+++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerButton.qml
-@@ -32,7 +32,7 @@ MouseArea {
- 
-             anchors.centerIn: parent
- 
--            source: button.down
-+            source: (button.down || assumeDown)
-                     ? button.iconSource + "?" + Theme.highlightColor
-                     : button.iconSource
- 
-@@ -40,4 +40,7 @@ MouseArea {
-             height: Theme.iconSizeLauncher
-         }
-     }
-+
-+    /* This is at the bottom to avoid conflicts with other patches */
-+    property bool assumeDown: false
- }
---- a/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
-+++ b/usr/share/lipstick-jolla-home-qt5/powerkey/PowerKeyMenu.qml
-@@ -19,6 +19,8 @@ SilicaListView {
-     property int itemCount: 5
-     property int stackCount: 4
- 
-+    readonly property bool lockIndication: !Lipstick.compositor.powerKeyLayer.intermediateStepReached
-+
-     readonly property bool largeScreen: Screen.sizeCategory >= Screen.Large
-     readonly property real exposure: currentItem
-             ? Lipstick.compositor.powerKeyLayer.absoluteExposure + currentItem.height - itemHeight
-@@ -46,6 +48,19 @@ SilicaListView {
-         }
-     }
- 
-+    /*
-+     * FIXME: I'm a bit of a noob with QML, is this the right way
-+     * to connect to a foreign signal?
-+    */
-+    Component.onCompleted: Lipstick.compositor.powerKeyLayer.edgeFilter.gestureTriggered.connect(powerMenu.lockScreen)
-+
-+    function lockScreen() {
-+        if (lockIndication) {
-+            Lipstick.compositor.powerKeyLayer.hide()
-+            Lipstick.compositor.setDisplayOff()
-+        }
-+    }
-+
-     model: AmbienceInstallModel {
-         id: installModel
- 
-@@ -178,6 +193,8 @@ SilicaListView {
-             clip: powerTransition.running
-             visible: !shutdownButton.visible || powerTransition.running
- 
-+            assumeDown: lockIndication
-+
-             onClicked: Lipstick.compositor.setDisplayOff()
- 
-             iconSource: "image://theme/graphic-display-blank"
---- a/usr/share/jolla-settings/pages/gestures/gestures.qml
-+++ b/usr/share/jolla-settings/pages/gestures/gestures.qml
-@@ -42,6 +42,30 @@ Page {
- 
-             IconTextSwitch {
+             TextSwitch {
                  automaticCheck: false
 +                checked: swipeToLockSettings.enabled
 +                text: "Swipe to lock"
@@ -173,7 +75,7 @@
                  //% "Quick Events access"
                  text: qsTrId("settings_display-la-left_peek_at_events")
 @@ -76,5 +100,13 @@ Page {
-         property bool left_peek_to_events: false
+         property bool lock_screen_camera: true
      }
  
 +    ConfigurationGroup {
@@ -186,3 +88,109 @@
 +
      DisplaySettings { id: displaySettings }
  }
+Index: /usr/share/lipstick-jolla-home-qt5/layers/TopMenuLayer.qml
+===================================================================
+--- .orig/usr/share/lipstick-jolla-home-qt5/layers/TopMenuLayer.qml
++++ /usr/share/lipstick-jolla-home-qt5/layers/TopMenuLayer.qml
+@@ -2,6 +2,7 @@ import QtQuick 2.0
+ import Sailfish.Silica 1.0
+ import Sailfish.Lipstick 1.0
+ import org.nemomobile.lipstick 0.1
++import org.nemomobile.configuration 1.0
+ 
+ EdgeLayer {
+     id: topMenuLayer
+@@ -29,6 +30,29 @@ EdgeLayer {
+     hintHeight: topMenu ? topMenu.itemHeight * 2 : 0
+     hintDuration: 600
+ 
++    property bool verticalOrientation: Lipstick.compositor.topmostWindowOrientation === Qt.PortraitOrientation
++                                       || Lipstick.compositor.topmostWindowOrientation === Qt.InvertedPortraitOrientation
++
++    ConfigurationGroup {
++        id: swipeToLockSettings
++
++        path: "/desktop/lipstick-jolla-home/swipeToLock"
++
++        property bool enabled: true
++        property int threshold: 50
++    }
++
++    intermediateStepThreshold: swipeToLockSettings.enabled ?
++                                   Math.round(
++                                       (
++                                           (verticalOrientation ?
++                                              Screen.height :
++                                              Screen.width
++                                           ) * swipeToLockSettings.threshold
++                                       ) / 100
++                                   ) :
++                                   0
++
+     function show() {
+         if (!active) {
+             toggleActive()
+Index: /usr/share/lipstick-jolla-home-qt5/topmenu/PowerButton.qml
+===================================================================
+--- .orig/usr/share/lipstick-jolla-home-qt5/topmenu/PowerButton.qml
++++ /usr/share/lipstick-jolla-home-qt5/topmenu/PowerButton.qml
+@@ -30,7 +30,7 @@ MouseArea {
+ 
+             anchors.centerIn: parent
+ 
+-            source: button.down
++            source: (button.down || assumeDown)
+                     ? button.iconSource + "?" + Theme.highlightColor
+                     : button.iconSource
+ 
+@@ -38,4 +38,8 @@ MouseArea {
+             height: Theme.iconSizeLauncher
+         }
+     }
++
++    /* This is at the bottom to avoid conflicts with other patches */
++    property bool assumeDown: false
++
+ }
+Index: /usr/share/lipstick-jolla-home-qt5/topmenu/TopMenu.qml
+===================================================================
+--- .orig/usr/share/lipstick-jolla-home-qt5/topmenu/TopMenu.qml
++++ /usr/share/lipstick-jolla-home-qt5/topmenu/TopMenu.qml
+@@ -30,6 +30,8 @@ SilicaFlickable {
+     signal shutdown()
+     signal reboot()
+ 
++    readonly property bool lockIndication: Lipstick.compositor.topMenuLayer.edgeFilter.active && !Lipstick.compositor.topMenuLayer.intermediateStepReached
++
+     readonly property int toggleColumns: Math.floor(width / Theme.itemSizeExtraLarge)
+     property int itemHeight: width/toggleColumns
+     readonly property bool exposed: Lipstick.compositor.topMenuLayer.exposed
+@@ -37,6 +39,19 @@ SilicaFlickable {
+     property alias exposedArea: background
+     property var contextMenu
+ 
++    /*
++     * FIXME: I'm a bit of a noob with QML, is this the right way
++     * to connect to a foreign signal?
++    */
++    Component.onCompleted: Lipstick.compositor.topMenuLayer.edgeFilter.gestureTriggered.connect(topMenu.lockScreen)
++
++    function lockScreen() {
++        if (lockIndication) {
++            Lipstick.compositor.topMenuLayer.hide()
++            Lipstick.compositor.setDisplayOff()
++        }
++    }
++
+     // When menu is fully open, keep it fixed at full content height instead of clipping the
+     // sections to the available screen width.
+     readonly property bool expanded: !atYEnd && (Lipstick.compositor.topMenuLayer.state == "visible"
+@@ -173,6 +188,8 @@ SilicaFlickable {
+ 
+                 visible: !shutdownButton.visible || powerTransition.running
+ 
++                assumeDown: lockIndication
++
+                 onClicked: Lipstick.compositor.setDisplayOff()
+ 
+                 iconSource: "image://theme/graphic-display-blank"
